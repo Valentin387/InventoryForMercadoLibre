@@ -18,17 +18,18 @@ def update(data):
 def fillout(e): #event
     #Delete whatever is in the entry box
     my_entry.delete(0, END)
-    box_entry.delete(0, END)
-
     #Add clicked list item to entry box
     content=my_list.get(ACTIVE)
+    my_entry.insert(0, content)
+
+    #Delete whatever is in the box_entry
+    box_entry.delete(0, END)
+    #I searched for the box according to the reference
     box=""
     for row in range(1,number_rows):
         for col in range(0,1):
             if excel_worksheet.cell_value(row,col) == content:
                 box=str(int(excel_worksheet.cell_value(row,col+1)))
-
-    my_entry.insert(0, content)
     box_entry.insert(0, box)
 
 #create function to check entry vs listbox
@@ -44,7 +45,7 @@ def check(e):
                 data.append(item)
     #update our listbos with selected items
     update(data)
-    
+
 
 #create a label
 my_label= Label(root, text="Start typing...",
