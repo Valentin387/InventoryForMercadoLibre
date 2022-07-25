@@ -1,8 +1,9 @@
 from tkinter import *
+import openpyxl
 
 root=Tk()
 root.title("Valentin, MercadoLibre Inventory")
-root.geometry("500x300")
+root.geometry("1000x500")
 
 #update the Listbox
 def update(data):
@@ -17,9 +18,19 @@ def update(data):
 def fillout(e): #event
     #Delete whatever is in the entry box
     my_entry.delete(0, END)
-
     #Add clicked list item to entry box
-    my_entry.insert(0, my_list.get(ACTIVE))
+    content=my_list.get(ACTIVE)
+    my_entry.insert(0, content)
+
+    #Delete whatever is in the box_entry
+    box_entry.delete(0, END)
+    #I searched for the box according to the reference
+    box=""
+    for row in range(2,number_rows+1):
+        for col in range(1,2):
+            if excel_worksheet.cell(row,col).value == content:
+                box=str(int(excel_worksheet.cell(row,col+1).value))
+    box_entry.insert(0, box)
 
 #create function to check entry vs listbox
 def check(e):
@@ -35,25 +46,74 @@ def check(e):
     #update our listbos with selected items
     update(data)
 
+def change_box():
+    new_box_number=0
+    try:
+        new_box_number=int(box_entry.get())
+    except:
+        print("Exception")
+    box_entry.delete(0,END)
+    reference=my_list.get(ACTIVE)
+
+
+    for row in range(2,number_rows):
+        for col in range(1,2):
+            if excel_worksheet.cell(row,col).value == reference:
+                excel_worksheet.cell(row,col+1).value=new_box_number
+    """
+    num=0
+    for row in range(2,number_rows+1):
+        for col in range(1,2):
+            excel_worksheet.cell(row,col+1).value=num
+            #num+=1
+    """
+    excel_workbook.save(path)
+
+def clear_entry():
+    my_entry.delete(0,END)
+
 #create a label
 my_label= Label(root, text="Start typing...",
-                font=("Helvetica",14), fg="grey")
-my_label.pack(pady=20)
+                font=("Helvetica",14), fg="black")
+my_label.pack(pady=20, side=TOP)
 
 #create an entry box
-my_entry = Entry(root, font=("Helvetica",12))
+my_entry = Entry(root, font=("Helvetica",15), width=50)
 my_entry.pack()
 
+clear_button=Button(root,text="clear", command=clear_entry)
+clear_button.pack(pady=20, side=TOP)
+
+change_button=Button(root,text="change box", command=change_box)
+change_button.pack(pady=20, side=RIGHT)
+
+box_label = Label(root, text="BOX",
+                    font=("Helvetica",15), fg="black")
+box_label.pack(pady=20, side=RIGHT)
+
+box_entry = Entry(root, font=("Helvetica",15), width=5)
+box_entry.pack(side=RIGHT)
+
 # Create a listbox
-my_list = Listbox(root, width=50)
+my_list = Listbox(root, font=("Helvetica",10), width=110, height=200)
 my_list.pack(pady=40)
 
 #Create a list
 products=[]
-with open("database.txt") as database:
-    lines=database.readlines()
-    for line in lines:
-        products.append(line)
+
+#path="Publications.xlsx"
+path="Publications.xlsx"
+excel_workbook = openpyxl.load_workbook(path)
+excel_worksheet = excel_workbook["Python"]
+
+number_cols=excel_worksheet.max_column
+number_rows=excel_worksheet.max_row
+print("cols :"+ str(number_cols) + ", rows: " + str(number_rows))
+
+for rowi in range(2,number_rows+1):
+    for col in range(1,2):
+        if excel_worksheet.cell(rowi,col).value !=None:
+            products.append(excel_worksheet.cell(rowi,col).value)
 
 update(products)
 
@@ -64,3 +124,4 @@ my_list.bind("<<ListboxSelect>>",fillout)
 my_entry.bind("<KeyRelease>", check)
 
 root.mainloop()
+print("END OF LINE")
