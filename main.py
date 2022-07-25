@@ -69,6 +69,9 @@ def change_box():
     """
     excel_workbook.save(path)
 
+def clear_entry():
+    my_entry.delete(0,END)
+
 #create a label
 my_label= Label(root, text="Start typing...",
                 font=("Helvetica",14), fg="black")
@@ -77,6 +80,9 @@ my_label.pack(pady=20, side=TOP)
 #create an entry box
 my_entry = Entry(root, font=("Helvetica",15), width=50)
 my_entry.pack()
+
+clear_button=Button(root,text="clear", command=clear_entry)
+clear_button.pack(pady=20, side=TOP)
 
 change_button=Button(root,text="change box", command=change_box)
 change_button.pack(pady=20, side=RIGHT)
