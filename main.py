@@ -26,7 +26,7 @@ def fillout(e): #event
     box_entry.delete(0, END)
     #I searched for the box according to the reference
     box=""
-    for row in range(2,number_rows):
+    for row in range(2,number_rows+1):
         for col in range(1,2):
             if excel_worksheet.cell(row,col).value == content:
                 box=str(int(excel_worksheet.cell(row,col+1).value))
@@ -47,7 +47,6 @@ def check(e):
     update(data)
 
 def change_box():
-    print(excel_worksheet.cell(5,2).value)
     new_box_number=0
     try:
         new_box_number=int(box_entry.get())
@@ -56,36 +55,19 @@ def change_box():
     box_entry.delete(0,END)
     reference=my_list.get(ACTIVE)
 
-    wb = openpyxl.load_workbook(path)
-    ws = wb["Python"]
-    """
+
     for row in range(2,number_rows):
         for col in range(1,2):
             if excel_worksheet.cell(row,col).value == reference:
                 excel_worksheet.cell(row,col+1).value=new_box_number
     """
-    num=1
-    for row in range(2,number_rows):
+    num=0
+    for row in range(2,number_rows+1):
         for col in range(1,2):
             excel_worksheet.cell(row,col+1).value=num
-            num+=1
-    print(excel_worksheet.cell(5,2).value)
-    wb.save(path)
-
-
-def get_maximum_rows(*, sheet_object):
-    rows=0
-    for max_row, row in enumerate(sheet_object,1):
-        if not all(col.value is None for col in row):
-            rows+=1
-    return rows
-
-def get_maximum_cols(*, sheet_object):
-    cols=0
-    for max_column, col in enumerate(sheet_object,1):
-        if not all(row.value is None for row in column):
-            cols+=1
-    return cols
+            #num+=1
+    """
+    excel_workbook.save(path)
 
 #create a label
 my_label= Label(root, text="Start typing...",
@@ -112,15 +94,9 @@ my_list.pack(pady=40)
 
 #Create a list
 products=[]
-"""
-with open("database.txt") as database:
-    lines=database.readlines()
-    for line in lines:
-        products.append(line)
-"""
 
 #path="Publications.xlsx"
-path="/Users/VALENTIN/Documents/UNIVERSIDAD/PROJECTS/MercadoLibre-Inventory/Publications.xlsx"
+path="Publications.xlsx"
 excel_workbook = openpyxl.load_workbook(path)
 excel_worksheet = excel_workbook["Python"]
 
@@ -128,7 +104,7 @@ number_cols=excel_worksheet.max_column
 number_rows=excel_worksheet.max_row
 print("cols :"+ str(number_cols) + ", rows: " + str(number_rows))
 
-for rowi in range(2,number_rows):
+for rowi in range(2,number_rows+1):
     for col in range(1,2):
         if excel_worksheet.cell(rowi,col).value !=None:
             products.append(excel_worksheet.cell(rowi,col).value)
@@ -142,5 +118,4 @@ my_list.bind("<<ListboxSelect>>",fillout)
 my_entry.bind("<KeyRelease>", check)
 
 root.mainloop()
-wb.save(path)
 print("END OF LINE")
