@@ -47,6 +47,7 @@ def check(e):
     update(data)
 
 def change_box():
+    print(excel_worksheet.cell(5,2).value)
     new_box_number=0
     try:
         new_box_number=int(box_entry.get())
@@ -57,7 +58,7 @@ def change_box():
 
     wb = openpyxl.load_workbook(path)
     ws = wb["Python"]
-
+    """
     for row in range(2,number_rows):
         for col in range(1,2):
             if excel_worksheet.cell(row,col).value == reference:
@@ -68,9 +69,9 @@ def change_box():
         for col in range(1,2):
             excel_worksheet.cell(row,col+1).value=num
             num+=1
-    """
-
+    print(excel_worksheet.cell(5,2).value)
     wb.save(path)
+
 
 def get_maximum_rows(*, sheet_object):
     rows=0
@@ -118,7 +119,8 @@ with open("database.txt") as database:
         products.append(line)
 """
 
-path="Publicaciones-2022_07_23-22_30.xlsx"
+#path="Publications.xlsx"
+path="/Users/VALENTIN/Documents/UNIVERSIDAD/PROJECTS/MercadoLibre-Inventory/Publications.xlsx"
 excel_workbook = openpyxl.load_workbook(path)
 excel_worksheet = excel_workbook["Python"]
 
@@ -140,4 +142,5 @@ my_list.bind("<<ListboxSelect>>",fillout)
 my_entry.bind("<KeyRelease>", check)
 
 root.mainloop()
+wb.save(path)
 print("END OF LINE")
