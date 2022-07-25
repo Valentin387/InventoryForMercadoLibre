@@ -1,5 +1,5 @@
 from tkinter import *
-import xlrd
+import openpyxl
 
 root=Tk()
 root.title("Valentin, MercadoLibre Inventory")
@@ -26,10 +26,10 @@ def fillout(e): #event
     box_entry.delete(0, END)
     #I searched for the box according to the reference
     box=""
-    for row in range(1,number_rows):
-        for col in range(0,1):
-            if excel_worksheet.cell_value(row,col) == content:
-                box=str(int(excel_worksheet.cell_value(row,col+1)))
+    for row in range(2,number_rows):
+        for col in range(1,2):
+            if excel_worksheet.cell(row,col).value == content:
+                box=str(int(excel_worksheet.cell(row,col+1).value))
     box_entry.insert(0, box)
 
 #create function to check entry vs listbox
@@ -46,15 +46,57 @@ def check(e):
     #update our listbos with selected items
     update(data)
 
+def change_box():
+    new_box_number=0
+    try:
+        new_box_number=int(box_entry.get())
+    except:
+        print("Exception")
+    box_entry.delete(0,END)
+    reference=my_list.get(ACTIVE)
+
+    wb = openpyxl.load_workbook(path)
+    ws = wb["Python"]
+
+    for row in range(2,number_rows):
+        for col in range(1,2):
+            if excel_worksheet.cell(row,col).value == reference:
+                excel_worksheet.cell(row,col+1).value=new_box_number
+    """
+    num=1
+    for row in range(2,number_rows):
+        for col in range(1,2):
+            excel_worksheet.cell(row,col+1).value=num
+            num+=1
+    """
+
+    wb.save(path)
+
+def get_maximum_rows(*, sheet_object):
+    rows=0
+    for max_row, row in enumerate(sheet_object,1):
+        if not all(col.value is None for col in row):
+            rows+=1
+    return rows
+
+def get_maximum_cols(*, sheet_object):
+    cols=0
+    for max_column, col in enumerate(sheet_object,1):
+        if not all(row.value is None for row in column):
+            cols+=1
+    return cols
 
 #create a label
 my_label= Label(root, text="Start typing...",
                 font=("Helvetica",14), fg="black")
-my_label.pack(pady=20)
+my_label.pack(pady=20, side=TOP)
 
 #create an entry box
 my_entry = Entry(root, font=("Helvetica",15), width=50)
 my_entry.pack()
+
+change_button=Button(root,text="change box", command=change_box)
+change_button.pack(pady=20, side=RIGHT)
 
 box_label = Label(root, text="BOX",
                     font=("Helvetica",15), fg="black")
@@ -76,18 +118,18 @@ with open("database.txt") as database:
         products.append(line)
 """
 
-path="Publicaciones-2022_07_23-22_30.xls"
-excel_workbook = xlrd.open_workbook(path)
-excel_worksheet = excel_workbook.sheet_by_index(3)
-number_cols=excel_worksheet.ncols
-number_rows=excel_worksheet.nrows
+path="Publicaciones-2022_07_23-22_30.xlsx"
+excel_workbook = openpyxl.load_workbook(path)
+excel_worksheet = excel_workbook["Python"]
+
+number_cols=excel_worksheet.max_column
+number_rows=excel_worksheet.max_row
 print("cols :"+ str(number_cols) + ", rows: " + str(number_rows))
 
-for row in range(1,number_rows):
-    for col in range(0,1):
-        #print(excel_worksheet.cell_value(row,col))
-        products.append(excel_worksheet.cell_value(row,col))
-
+for rowi in range(2,number_rows):
+    for col in range(1,2):
+        if excel_worksheet.cell(rowi,col).value !=None:
+            products.append(excel_worksheet.cell(rowi,col).value)
 
 update(products)
 
@@ -98,3 +140,4 @@ my_list.bind("<<ListboxSelect>>",fillout)
 my_entry.bind("<KeyRelease>", check)
 
 root.mainloop()
+print("END OF LINE")
